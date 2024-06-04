@@ -77,7 +77,9 @@ const NotesPanel = ({
     ],
     shallowEqual,
   );
-  const currentWidth = currentLeftPanelWidth || currentNotesPanelWidth;
+  let currentWidth = currentLeftPanelWidth || currentNotesPanelWidth;
+  // Make sure the panel is wide enough for the DatePicker component
+  if (currentWidth < 330) { currentWidth = 330; }
 
   const dispatch = useDispatch();
 

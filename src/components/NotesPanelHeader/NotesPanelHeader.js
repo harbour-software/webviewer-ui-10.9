@@ -16,6 +16,10 @@ import Events from 'constants/events';
 import { getSortStrategies } from 'constants/sortStrategies';
 import DataElements from 'src/constants/dataElement';
 
+import DatePicker from 'react-datepicker';
+// https://github.com/glennflanagan/react-collapsible
+import Collapsible from 'react-collapsible';
+
 import './NotesPanelHeader.scss';
 
 const SORT_CONTAINER_ELEMENT = 'sortContainer';
@@ -46,6 +50,13 @@ function NotesPanelHeader({
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const [filterEnabled, setFilterEnabled] = useState(false);
+  const [startDate, setStartDate] = useState();
+  const _annotHistoryDtpOnChange = date => {
+    setStartDate(date)
+    let evt = new CustomEvent('annotHistoryDateSelected', { detail: date });
+    window.dispatchEvent(evt);
+    //console.log(`This is from _annotHistoryDtpOnChange: ${date}`)
+  }
 
   useEffect(() => {
     // check if Redux filter state is enabled on mount and set filterEnabled to true
@@ -96,11 +107,26 @@ function NotesPanelHeader({
     </div>
   );
 
-  const originalHeaderElement = (
-    <DataElementWrapper
-      className="header"
-      dataElement="notesPanelHeader">
+  const collapsedHeaderElement = (
+    <Collapsible trigger="History / Search">
+      <span className="label">History:&nbsp;</span>
 
+      <div className="input-container">
+        <DatePicker 
+          id="annotHistoryDtp"
+          selected={startDate}
+          showTimeSelect
+          timeIntervals={15}
+          dateFormat="dd/MM/yyyy h:mm aa"
+          isClearable
+          placeholderText="Select a date to view annotation history"
+          portalId="notesPanelHeader"
+          onChange={(date) => _annotHistoryDtpOnChange(date)}
+        />
+      </div>
+      <br />
+
+      <span className="label">Search:&nbsp;</span>
       <DataElementWrapper
         className="input-container"
         dataElement={`${DataElements.NotesPanel.DefaultHeader.INPUT_CONTAINER}`}>
@@ -112,6 +138,15 @@ function NotesPanelHeader({
           id="NotesPanel__input"
         />
       </DataElementWrapper>
+    </Collapsible>
+  );
+
+  const originalHeaderElement = (
+    <DataElementWrapper
+      className="header"
+      dataElement="notesPanelHeader">
+
+      { collapsedHeaderElement }
 
       <DataElementWrapper
         className="comments-counter"
@@ -126,6 +161,12 @@ function NotesPanelHeader({
         <div
           className="buttons-container"
         >
+          <Button
+            dataElement="hideShowNotesButton"
+            className="hide-show-notes-button"
+            title="Toggle Annotations"
+            img="icon-header-chat-fill"
+          />
           {(!isMultiSelectEnabled) ? null :
             <Button
               dataElement={DataElements.NOTE_MULTI_SELECT_MODE_BUTTON}

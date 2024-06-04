@@ -6,6 +6,9 @@ export default (dispatch, documentViewerKey) => () => {
   dispatch(
     actions.closeElements([
       'pageNavOverlay',
+      'pageSliderOverlay',
+      'pagePreviousOverlay',
+      'pageNextOverlay',
       'notesPanel',
       'searchPanel',
       'leftPanel',
